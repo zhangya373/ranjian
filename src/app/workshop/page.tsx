@@ -1,4 +1,6 @@
 "use client";
+import RealProcessCard from "../../components/RealProcessCard";
+import { mapToRealProcess } from "../../lib/processMapping";
 
 import { useMemo, useRef, useState } from "react";
 import DyePreview from "../../components/DyePreview";
@@ -14,6 +16,7 @@ import { saveWork } from "../../lib/storage";
 
 export default function WorkshopPage() {
   const [params, setParams] = useState<DyeParams>({ ...DEFAULT_DYE_PARAMS });
+  const realProcess = mapToRealProcess(params);
   const [message, setMessage] = useState("拖动左侧参数，右侧样布会实时变化。");
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -69,6 +72,13 @@ export default function WorkshopPage() {
             把扎染工艺拆成可计算参数。每次调节都会重新计算染液渗透、留白阻染与纹样展开结果。
           </p>
         </div>
+        <RealProcessCard
+        tightness={params.tightness}
+        tensionN={realProcess.tensionN}
+        concentrationGL={realProcess.concentrationGL}
+        dyeTimeMin={realProcess.dyeTimeMin}
+        edgeWidthMM={realProcess.edgeWidthMM}
+      />
 
         <div className="workshop-layout">
           <aside className="control-panel">
