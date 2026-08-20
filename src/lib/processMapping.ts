@@ -13,11 +13,49 @@ export type CalibrationProfile = {
 };
 
 export const currentCalibration: CalibrationProfile = {
-  tensionN: [],
-  concentrationGL: [],
-  dyeTimeMin: [],
-  edgeWidthMM: [],
+  // 数字扎结力度 → 现实绳张力 N
+  // 说明：此项为工程经验估计，并非标准化实测值
+  tensionN: [
+    { digital: 0, real: 4.0 },
+    { digital: 20, real: 6.0 },
+    { digital: 40, real: 9.0 },
+    { digital: 60, real: 12.0 },
+    { digital: 80, real: 15.0 },
+    { digital: 100, real: 18.0 },
+  ],
+
+  // 数字染液浓度 → 靛蓝染液浓度 g/L
+  concentrationGL: [
+    { digital: 0, real: 0.5 },
+    { digital: 20, real: 0.8 },
+    { digital: 40, real: 1.2 },
+    { digital: 60, real: 1.8 },
+    { digital: 80, real: 2.5 },
+    { digital: 100, real: 3.5 },
+  ],
+
+  // DyeSim数字染色时间 → 现实单次浸染时间 min
+  dyeTimeMin: [
+    { digital: 0, real: 0.25 },
+    { digital: 20, real: 0.5 },
+    { digital: 40, real: 0.75 },
+    { digital: 60, real: 1.0 },
+    { digital: 80, real: 2.0 },
+    { digital: 100, real: 5.0 },
+  ],
+
+  // 数字扩散度 → 蓝白边缘过渡宽度 mm
+  // 此项为视觉工程估计值
+  edgeWidthMM: [
+    { digital: 0, real: 1.0 },
+    { digital: 20, real: 2.0 },
+    { digital: 40, real: 3.5 },
+    { digital: 60, real: 5.0 },
+    { digital: 80, real: 7.0 },
+    { digital: 100, real: 9.5 },
+  ],
 };
+
 
 function interpolate(
   points: CalibrationPoint[],

@@ -30,15 +30,29 @@ export default function RealProcessCard({
         background: "#faf8f2",
       }}
     >
-      <div style={{ fontSize: 12, opacity: 0.55 }}>
+      <div
+        style={{
+          fontSize: 12,
+          opacity: 0.55,
+        }}
+      >
         REAL PROCESS
       </div>
 
-      <h3 style={{ margin: "5px 0 6px" }}>
+      <h3
+        style={{
+          margin: "5px 0 6px",
+        }}
+      >
         现实工艺参数映射
       </h3>
 
-      <p style={{ fontSize: 13, opacity: 0.65 }}>
+      <p
+        style={{
+          fontSize: 13,
+          opacity: 0.65,
+        }}
+      >
         将 DyeSim 数字参数转换为现实扎染可执行参数
       </p>
 
@@ -67,21 +81,20 @@ export default function RealProcessCard({
         value={showValue(edgeWidthMM, "mm")}
       />
 
-      {tensionN === null && (
-        <div
-          style={{
-            marginTop: 14,
-            padding: 12,
-            borderRadius: 12,
-            background: "rgba(20,54,91,.06)",
-            fontSize: 12,
-            lineHeight: 1.7,
-          }}
-        >
-          当前数字模型尚未完成真实实验标定，因此不虚构
-          N、g/L 和 mm 数值。完成真实扎染实验后会自动映射。
-        </div>
-      )}
+      <div
+        style={{
+          marginTop: 14,
+          padding: 12,
+          borderRadius: 12,
+          background: "rgba(20,54,91,.06)",
+          fontSize: 12,
+          lineHeight: 1.7,
+          opacity: 0.75,
+        }}
+      >
+        V1 经验标定：基于公开靛蓝扎染工艺资料与工程估算建立，
+        用于数字试染与现实工艺之间的初步映射，后续可通过真实样本继续校准。
+      </div>
     </section>
   );
 }
@@ -98,12 +111,27 @@ function Row({
       style={{
         display: "flex",
         justifyContent: "space-between",
+        alignItems: "center",
+        gap: 16,
         padding: "9px 0",
         borderBottom: "1px solid rgba(20,54,91,.08)",
       }}
     >
-      <span style={{ opacity: 0.65 }}>{name}</span>
-      <strong>{value}</strong>
+      <span
+        style={{
+          opacity: 0.65,
+        }}
+      >
+        {name}
+      </span>
+
+      <strong
+        style={{
+          textAlign: "right",
+        }}
+      >
+        {value}
+      </strong>
     </div>
   );
 }
