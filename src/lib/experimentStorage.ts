@@ -1,9 +1,10 @@
 export type ExperimentProcess = {
-  tensionN: number | null;
+  knotCount: number | null;
   concentrationGL: number | null;
   dyeTimeMin: number | null;
   edgeWidthMM: number | null;
 };
+
 
 export type RealExperiment = {
   id: string;

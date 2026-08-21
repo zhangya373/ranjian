@@ -1,10 +1,3 @@
-export type RealProcessValues = {
-  tensionN: number | null;
-  concentrationGL: number | null;
-  dyeTimeMin: number | null;
-  edgeWidthMM: number | null;
-};
-
 export type ErrorDirection =
   | "high"
   | "low"
@@ -14,114 +7,129 @@ export type ErrorLevel =
   | "good"
   | "mild"
   | "medium"
-  | "high";
+  | "large";
 
 export type ErrorMetric = {
   actual: number;
   predicted: number;
-
-  // AI预测值 - 真实值
-  signedError: number;
-
-  // 绝对误差
   absoluteError: number;
-
-  // 相对误差百分比
   relativeErrorPercent: number;
-
-  // AI偏高 / 偏低 / 基本准确
   direction: ErrorDirection;
-
-  // 偏差等级
   level: ErrorLevel;
 };
 
+/**
+ * 真实实验参数
+ */
+export type RealProcessValues = {
+  knotCount: number;
+  concentrationGL: number;
+  dyeTimeMin: number;
+  edgeWidthMM: number;
+};
+
+/**
+ * AI 预测参数
+ *
+ * AI 某些参数可能识别不到，
+ * 所以允许为 null。
+ */
+export type PredictedProcessValues = {
+  knotCount: number | null;
+  concentrationGL: number | null;
+  dyeTimeMin: number | null;
+  edgeWidthMM: number | null;
+};
+
+/**
+ * 验证结果
+ */
 export type ValidationResult = {
-  tension: ErrorMetric | null;
+  knotCount: ErrorMetric | null;
   concentration: ErrorMetric | null;
   dyeTime: ErrorMetric | null;
   edgeWidth: ErrorMetric | null;
 };
 
-function getErrorLevel(
-  percent: number
-): ErrorLevel {
-  if (percent < 10) return "good";
-  if (percent < 20) return "mild";
-  if (percent < 35) return "medium";
-
-  return "high";
-}
-
-function compareValue(
-  actual: number | null,
+/**
+ * 计算单项误差
+ */
+function calculateErrorMetric(
+  actual: number,
   predicted: number | null
 ): ErrorMetric | null {
-  if (
-    actual === null ||
-    predicted === null ||
-    !Number.isFinite(actual) ||
-    !Number.isFinite(predicted)
-  ) {
+  if (predicted === null) {
     return null;
   }
 
-  const signedError =
-    predicted - actual;
-
-  const absoluteError =
-    Math.abs(signedError);
+  const absoluteError = Math.abs(
+    predicted - actual
+  );
 
   const relativeErrorPercent =
     actual === 0
-      ? 0
-      : (absoluteError /
-          Math.abs(actual)) *
+      ? absoluteError === 0
+        ? 0
+        : 100
+      : (absoluteError / Math.abs(actual)) *
         100;
 
-  let direction: ErrorDirection =
-    "accurate";
+  let direction: ErrorDirection;
 
-  if (signedError > 0.0001) {
+  if (Math.abs(predicted - actual) < 0.000001) {
+    direction = "accurate";
+  } else if (predicted > actual) {
     direction = "high";
-  } else if (signedError < -0.0001) {
+  } else {
     direction = "low";
+  }
+
+  let level: ErrorLevel;
+
+  if (relativeErrorPercent <= 10) {
+    level = "good";
+  } else if (relativeErrorPercent <= 20) {
+    level = "mild";
+  } else if (relativeErrorPercent <= 40) {
+    level = "medium";
+  } else {
+    level = "large";
   }
 
   return {
     actual,
     predicted,
-    signedError,
     absoluteError,
     relativeErrorPercent,
     direction,
-    level: getErrorLevel(
-      relativeErrorPercent
-    ),
+    level,
   };
 }
 
+/**
+ * 比较真实实验参数与 AI 预测参数
+ */
 export function validatePrediction(
   actual: RealProcessValues,
-  predicted: RealProcessValues
+  predicted: PredictedProcessValues
 ): ValidationResult {
   return {
-    tension: compareValue(
-      actual.tensionN,
-      predicted.tensionN
+    knotCount: calculateErrorMetric(
+      actual.knotCount,
+      predicted.knotCount
     ),
 
-    concentration: compareValue(
+    concentration: calculateErrorMetric(
       actual.concentrationGL,
       predicted.concentrationGL
     ),
 
-    dyeTime: compareValue(
+    dyeTime: calculateErrorMetric(
       actual.dyeTimeMin,
       predicted.dyeTimeMin
     ),
 
-    edgeWidth: compareValue(
+    edgeWidth: calculateErrorMetric(
       actual.edgeWidthMM,
       predicted.edgeWidthMM
     ),
