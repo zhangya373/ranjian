@@ -4,6 +4,7 @@ const links = [
   { href: "/", label: "首页" },
   { href: "/workshop", label: "虚拟试染" },
   { href: "/reverse", label: "AI逆向设计" },
+ { href: "/validation", label: "AI纠偏" },
   { href: "/challenge", label: "复刻挑战" },
   { href: "/works", label: "作品" },
   { href: "/about", label: "关于" },

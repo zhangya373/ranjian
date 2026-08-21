@@ -15,6 +15,7 @@ export type CalibrationProfile = {
 export const currentCalibration: CalibrationProfile = {
   // 数字扎结力度 → 现实绳张力 N
   // 说明：此项为工程经验估计，并非标准化实测值
+  // 暂时保留，用于兼容现有页面和功能
   tensionN: [
     { digital: 0, real: 4.0 },
     { digital: 20, real: 6.0 },
@@ -56,7 +57,6 @@ export const currentCalibration: CalibrationProfile = {
   ],
 };
 
-
 function interpolate(
   points: CalibrationPoint[],
   value: number
@@ -81,24 +81,43 @@ function interpolate(
     const a = sorted[i];
     const b = sorted[i + 1];
 
-    if (value >= a.digital && value <= b.digital) {
+    if (
+      value >= a.digital &&
+      value <= b.digital
+    ) {
       const ratio =
         (value - a.digital) /
         (b.digital - a.digital);
 
-      return a.real + ratio * (b.real - a.real);
+      return (
+        a.real +
+        ratio * (b.real - a.real)
+      );
     }
   }
 
   return null;
 }
 
-export function mapToRealProcess(params: DyeParams) {
+export function mapToRealProcess(
+  params: DyeParams
+) {
   return {
+    // 旧参数：暂时保留
     tensionN: interpolate(
       currentCalibration.tensionN,
       params.tightness
     ),
+
+    // 新参数：扎结数量
+    // 直接使用 DyeParams.knots
+    knotCount:
+      typeof params.knots === "number"
+        ? Math.max(
+            0,
+            Math.round(params.knots)
+          )
+        : null,
 
     concentrationGL: interpolate(
       currentCalibration.concentrationGL,
@@ -117,7 +136,9 @@ export function mapToRealProcess(params: DyeParams) {
   };
 }
 
-export function tightnessLabel(value: number) {
+export function tightnessLabel(
+  value: number
+) {
   if (value < 30) return "较松";
   if (value < 55) return "中等";
   if (value < 80) return "较紧";
